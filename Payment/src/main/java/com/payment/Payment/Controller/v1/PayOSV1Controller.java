@@ -48,21 +48,27 @@ public class PayOSV1Controller {
         );
     }
 
+//    @PostMapping("/webhook")
+//    public ResponseEntity<String> handleWebhook(@RequestBody PayOSWebhookRequest payload) {
+//        log.info("Updating status for orderCode={} linkId={}", payload.getOrderCode(), payload.getPaymentLinkId());
+//        PaymentTransactionResponse p = paymentService.updatePaymentStatus(payload);
+//        log.info("Updated transaction status to: {}", p.getStatus());
+//        webSocketService.sendToWebSocket(
+//                WebSocketTopic.NOTI_NOTIFICATION.getValue() + p.getTableID(),
+//                new WebsocketReq(WSFCMCode.PAYMENT, p)
+//        );
+//        webSocketService.sendToWebSocket(
+//                WebSocketTopic.DASHBOARD.getValue(),
+//                new WebsocketReq(WSFCMCode.PAYMENT, p)
+//        );
+//        log.info("send message by websocket to table: {} ", p.getTableID());
+//        return ResponseEntity.ok("OK");
+//    }
+
     @PostMapping("/webhook")
-    public ResponseEntity<String> handleWebhook(@RequestBody PayOSWebhookRequest payload) {
-        log.info("Updating status for orderCode={} linkId={}", payload.getOrderCode(), payload.getPaymentLinkId());
-        PaymentTransactionResponse p = paymentService.updatePaymentStatus(payload);
-        log.info("Updated transaction status to: {}", p.getStatus());
-        webSocketService.sendToWebSocket(
-                WebSocketTopic.NOTI_NOTIFICATION.getValue() + p.getTableID(),
-                new WebsocketReq(WSFCMCode.PAYMENT, p)
-        );
-        webSocketService.sendToWebSocket(
-                WebSocketTopic.DASHBOARD.getValue(),
-                new WebsocketReq(WSFCMCode.PAYMENT, p)
-        );
-        log.info("send message by websocket to table: {} ", p.getTableID());
-        return ResponseEntity.ok("OK");
+    public ResponseEntity<String> handleWebhook(@RequestBody(required = false) String body) {
+        log.info("📦 Raw Webhook JSON: {}", body);
+        return ResponseEntity.ok("Received");
     }
 
 }

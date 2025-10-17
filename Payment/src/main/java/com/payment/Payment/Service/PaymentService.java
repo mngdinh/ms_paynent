@@ -155,6 +155,7 @@ public class PaymentService extends BaseSpecificationService<PaymentTransaction,
         }
         p.setUpdatedAt(LocalDateTime.now());
         String status = request.getStatus();
+        log.info("request status={}", status);
         if (status != null) {
             switch (status.toUpperCase()) {
                 case "PAID":
