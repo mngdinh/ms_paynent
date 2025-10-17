@@ -73,6 +73,15 @@ jwt:
 #app:
 #  frontend:
 #    url: ${FRONTEND_URL}
+payos:
+  client-id: ${PAYOS_CLIENT_ID}
+  api-key: ${PAYOS_API_KEY}
+  checksum-key: ${PAYOS_CHECKSUM_KEY}
+  frontend-domain: ${PAYOS_FRONTEND_DOMAIN}
+app:
+  backend:
+    url: ${BACKEND_URL}
+
 
 
 

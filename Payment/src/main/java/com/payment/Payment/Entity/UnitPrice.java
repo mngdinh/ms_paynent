@@ -1,5 +1,6 @@
 package com.payment.Payment.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.payment.Payment.Enum.CurencyCode;
 import com.payment.Payment.Enum.TableType;
 import jakarta.persistence.*;
@@ -23,7 +24,7 @@ public class UnitPrice {
     private Integer unitPriceID;
 
     @NotNull
-    @Column(name = "storeID", nullable = false, length = 50)
+    @Column(name = "storeID", nullable = false, length = 50, unique = true)
     private String storeID;
 
     @NotNull
@@ -36,11 +37,16 @@ public class UnitPrice {
     private Double basePrice;
 
     @NotNull
+    @Column(name = "baseUnit", length = 10)
+    private String baseUnit;
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "currencyCode", length = 10)
     private CurencyCode currencyCode; // VND, USD
 
     @OneToMany(mappedBy = "unitPrice", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<PaymentTransaction>  paymentTransactions = new ArrayList<>();
 
 }

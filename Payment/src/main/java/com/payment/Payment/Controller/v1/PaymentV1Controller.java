@@ -1,11 +1,14 @@
 package com.payment.Payment.Controller.v1;
 
 import com.payment.Payment.DTOs.Request.PageableRequestDto;
-import com.payment.Payment.DTOs.Request.UnitPriceRequest;
+import com.payment.Payment.DTOs.Request.PaymentTransactionRequest;
 import com.payment.Payment.DTOs.Respone.PageableResponseDto;
+import com.payment.Payment.DTOs.Respone.PaymentTransactionResponse;
 import com.payment.Payment.DTOs.Respone.ResponseObject;
 import com.payment.Payment.DTOs.Respone.UnitPriceResponse;
-import com.payment.Payment.Enum.TableType;
+import com.payment.Payment.Entity.UnitPrice;
+import com.payment.Payment.Enum.PaymentStatus;
+import com.payment.Payment.Service.PaymentService;
 import com.payment.Payment.Service.UnitPriceService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,36 +23,48 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Tag(name = "Unit Price V1", description = "Unit Price API")
+@Tag(name = "Payment V1", description = "Payment API")
 @RestController
-@RequestMapping("v1/prices")
+@RequestMapping("v1/payments")
 @CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class UnitPriceV1Controller {
+public class PaymentV1Controller {
 
+    private final PaymentService paymentService;
     private final UnitPriceService unitPriceService;
 
     @PostMapping
-    public ResponseObject createUnitPrice(@RequestBody UnitPriceRequest unitPriceRequest) {
+    public ResponseObject createPaymentTransaction(@RequestBody PaymentTransactionRequest request) {
+        UnitPrice rs = unitPriceService.findByStoreAndTableType(request.getStoreID(), request.getTableType());
+        PaymentTransactionResponse response = paymentService.createPaymentTransaction(request, rs);
+
+
+
         return ResponseObject.builder()
                 .status(1000)
-                .message("Unit Price created successfully")
-                .data(unitPriceService.createUnitPrice(unitPriceRequest))
+                .message("Payment Transaction Created")
+                .data(response)
                 .build();
     }
 
     @GetMapping
-    public ResponseObject getUnitPrices(
-            @Parameter(description = "Query type: all, byStore, byType",
+    public ResponseObject getPayment(
+            @Parameter(description = "Query type: all, byStore, byId",
                     required = true,
                     schema = @Schema(
-                            allowableValues = {"all", "byType", "byStore"}
+                            allowableValues = {"all", "byUnitPrice", "byTable", "byCustomer", "byTableType", "byMatch"}
                     ))
-            @RequestParam(required = true, defaultValue = "all") String queryType,
+            @RequestParam(defaultValue = "all") String queryType,
 
-            @Parameter(description = "Store ID (required for queryType=byStore)")
-            @RequestParam(required = false) String storeId,
+            @Parameter(description = "Unit Price ID (required for queryType=byUnitPrice)")
+            @RequestParam(required = false) Integer unitTypeID,
+
+            @Parameter(description = "Table ID (required for queryType=byTable)")
+            @RequestParam(required = false) String tableID,
+
+            @Parameter(description = "Customer ID (required for queryType=byCustomer)")
+            @RequestParam(required = false) String customerID,
 
             @Parameter(description = "Table Type",
                     required = false,
@@ -57,6 +72,9 @@ public class UnitPriceV1Controller {
                             allowableValues = {"null", "Pool", "Carom", "Snooker"}
                     ))
             @RequestParam(required = false, defaultValue = "null") String tableType,
+
+            @Parameter(description = "Match ID (required for queryType=byMatch)")
+            @RequestParam(required = false) Integer matchID,
 
             @Parameter(description = "Page number (1-based)", required = true)
             @RequestParam(required = false, defaultValue = "1") Integer page,
@@ -88,8 +106,11 @@ public class UnitPriceV1Controller {
 
         Map<String, Object> filters = new HashMap<>();
         filters.put("queryType", queryType);
-        if (storeId != null && !storeId.isEmpty()) filters.put("storeId", storeId);
+        if (unitTypeID != null) filters.put("unitTypeID", unitTypeID);
+        if (matchID != null) filters.put("matchID", matchID);
         if ( tableType!= null && !"null".equals(tableType)) filters.put("tableType", tableType);
+        if ( tableID!= null && !"null".equals(tableID)) filters.put("tableID", tableID);
+        if ( customerID!= null && !"null".equals(customerID)) filters.put("customerID", customerID);
 
         PageableResponseDto<UnitPriceResponse> p = unitPriceService.getAll(req, filters);
 
@@ -100,21 +121,24 @@ public class UnitPriceV1Controller {
                 .build();
     }
 
-    @PutMapping
-    public ResponseObject updateUnitPrice(@RequestBody UnitPriceRequest unitPriceRequest) {
+    @PutMapping("/status")
+    public ResponseObject updatePaymentTransactionStatus(
+            @RequestParam(required = true) String transactionID,
+            @RequestParam(required = true)PaymentStatus paymentStatus
+            ) {
         return ResponseObject.builder()
                 .status(1000)
-                .message("Unit Price updated successfully")
-                .data(unitPriceService.updateUnitPrice(unitPriceRequest))
+                .message("Payment Transaction Updated")
+                .data(paymentService.updatePaymentStatus(transactionID, paymentStatus))
                 .build();
     }
 
-    @DeleteMapping
-    public ResponseObject deleteUnitPrice(@RequestParam Integer unitPriceID) {
+    @DeleteMapping("/{id}")
+    public ResponseObject deletePaymentTransaction(@PathVariable String id) {
         return ResponseObject.builder()
                 .status(1000)
-                .message("Unit Price deleted successfully")
-                .data(unitPriceService.deleteUnitPrice(unitPriceID))
+                .message("Payment Transaction Deleted")
+                .data(paymentService.deletePaymentTransaction(id))
                 .build();
     }
 

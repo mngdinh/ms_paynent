@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PaymentTransactionResponse {
     private String transactionID;
-    private UnitPrice unitPrice;
+    private Double basePrice;
+    private String baseUnit;
     private String tableID;
     private Integer matchID;
     private String customerID;

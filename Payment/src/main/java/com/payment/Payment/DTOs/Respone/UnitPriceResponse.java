@@ -16,6 +16,7 @@ public class UnitPriceResponse {
     private String storeID;
     private TableType tableType;
     private Double basePrice;
+    private String baseUnit;
     private CurencyCode currencyCode; // VND, USD
     private List<PaymentTransactionResponse> paymentTransactions;
 }

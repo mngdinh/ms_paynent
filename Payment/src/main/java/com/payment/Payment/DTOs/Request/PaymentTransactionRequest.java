@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class PaymentTransactionRequest {
-    private Integer unitPriceID;
+    private String storeID;
     private String tableID;
     private Integer matchID;
     private String customerID;
@@ -19,5 +19,4 @@ public class PaymentTransactionRequest {
     private TableType tableType;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private PaymentMethod paymentMethod; // VNPAY / MOMO / CASH
 }

@@ -1,5 +1,6 @@
 package com.payment.Payment.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.payment.Payment.Enum.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +24,7 @@ public class PaymentTransaction {
     @ManyToOne
     @NotNull
     @JoinColumn(name = "unitPriceID", nullable = false)
+    @JsonBackReference
     private UnitPrice unitPrice;
 
     @NotNull

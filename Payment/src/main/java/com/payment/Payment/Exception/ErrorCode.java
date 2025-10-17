@@ -21,6 +21,7 @@ public enum ErrorCode {
     UNCATEGORIES_EXCEPTION(9999, "Uncategories exception", HttpStatus.INTERNAL_SERVER_ERROR),
     RECORD_EXIST(1004, "Record already exists", HttpStatus.CONFLICT),
     NULL_RECORD(1005,"Null Record", HttpStatus.CONFLICT),
+    PAYMENT_INVALID_SIGN(1006, "Payment Invalid Sign", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

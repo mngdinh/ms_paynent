@@ -3,6 +3,8 @@ package com.payment.Payment.Service;
 import com.payment.Payment.DTOs.Request.UnitPriceRequest;
 import com.payment.Payment.DTOs.Respone.UnitPriceResponse;
 import com.payment.Payment.Entity.UnitPrice;
+import com.payment.Payment.Enum.BaseUnit;
+import com.payment.Payment.Enum.TableType;
 import com.payment.Payment.Exception.AppException;
 import com.payment.Payment.Exception.ErrorCode;
 import com.payment.Payment.Mapper.UnitPriceMapper;
@@ -76,11 +78,26 @@ public class UnitPriceService extends BaseSpecificationService<UnitPrice, UnitPr
     @Override
     @Transactional
     public UnitPriceResponse createUnitPrice(UnitPriceRequest request) {
-        UnitPrice unit = unitPriceRepo.findByStoreIDAndTableType(request.getStoreID(), request.getTableType());
-        if (unit != null) throw new AppException(ErrorCode.RECORD_EXIST);
-        unit = unitPriceMapper.toUnitPrice(request);
-        unitPriceRepo.save(unit);
-        return unitPriceMapper.toUnitPriceResponse(unit);
+        // Kiểm tra xem có record nào trùng không
+        UnitPrice existing = unitPriceRepo.findByStoreIDAndTableType(request.getStoreID(), request.getTableType());
+
+        // Nếu tồn tại -> cập nhật field
+        String baseUnit = BaseUnit.VND_PER_HOUR.name().replace("_PER_", "/").replace("_", " ");
+        if (existing != null) {
+            existing.setBasePrice(request.getBasePrice());
+            existing.setBaseUnit(baseUnit);
+            existing.setCurrencyCode(request.getCurrencyCode());
+            // ... cập nhật thêm các field khác nếu cần
+            unitPriceRepo.save(existing);
+            return unitPriceMapper.toUnitPriceResponse(existing);
+        }
+
+        // Nếu chưa tồn tại -> tạo mới
+        UnitPrice newUnit = unitPriceMapper.toUnitPrice(request);
+        newUnit.setBaseUnit(baseUnit);
+        unitPriceRepo.save(newUnit);
+
+        return unitPriceMapper.toUnitPriceResponse(newUnit);
     }
 
     @Override
@@ -88,6 +105,30 @@ public class UnitPriceService extends BaseSpecificationService<UnitPrice, UnitPr
         UnitPrice u = unitPriceRepo.findById(unitPriceID)
                 .orElseThrow(() -> new AppException(ErrorCode.NULL_RECORD));
         return unitPriceMapper.toUnitPriceResponse(u);
+    }
+
+    @Override
+    public UnitPrice findByStoreAndTableType(String storeID,  TableType tableType) {
+        UnitPrice unit = unitPriceRepo.findByStoreIDAndTableType(storeID, tableType);
+        if (unit == null) throw new AppException(ErrorCode.NULL_RECORD);
+        return unit;
+    }
+
+    @Override
+    public UnitPriceResponse updateUnitPrice(UnitPriceRequest unitPriceRequest) {
+        UnitPrice u = findByStoreAndTableType(unitPriceRequest.getStoreID(), unitPriceRequest.getTableType());
+        u.setBasePrice(unitPriceRequest.getBasePrice());
+        u.setCurrencyCode(unitPriceRequest.getCurrencyCode());
+        return unitPriceMapper.toUnitPriceResponse(unitPriceRepo.save(u));
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteUnitPrice(Integer unitPriceID) {
+        UnitPrice u = unitPriceRepo.findById(unitPriceID)
+                .orElseThrow(() -> new AppException(ErrorCode.NULL_RECORD));
+        unitPriceRepo.delete(u);
+        return true;
     }
 
 
