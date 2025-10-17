@@ -5,8 +5,8 @@ FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
 # Copy project files
-COPY pom.xml .
-COPY src ./src
+COPY Payment/pom.xml .
+COPY Payment/src ./src
 #COPY /scorelens/uploads uploads
 #COPY "ArialUnicodeMSBold.ttf" /app/
 
@@ -24,7 +24,7 @@ FROM eclipse-temurin:21-jdk-jammy
 WORKDIR /app
 
 # Copy the built JAR from the build stage
-COPY --from=build /app/target/scorelens-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 
 # ✅ Copy Kafka TLS certs folder
 #COPY /certs certs
