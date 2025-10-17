@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 public class PaymentTransaction {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "transactionID", nullable = false, length = 50)
     private String transactionID;
 

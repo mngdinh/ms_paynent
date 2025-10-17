@@ -6,8 +6,10 @@ import com.payment.Payment.DTOs.Respone.PageableResponseDto;
 import com.payment.Payment.DTOs.Respone.PaymentTransactionResponse;
 import com.payment.Payment.DTOs.Respone.ResponseObject;
 import com.payment.Payment.DTOs.Respone.UnitPriceResponse;
+import com.payment.Payment.Entity.PaymentTransaction;
 import com.payment.Payment.Entity.UnitPrice;
 import com.payment.Payment.Enum.PaymentStatus;
+import com.payment.Payment.Mapper.PaymentMapper;
 import com.payment.Payment.Service.PayOSService;
 import com.payment.Payment.Service.PaymentService;
 import com.payment.Payment.Service.UnitPriceService;
@@ -36,12 +38,14 @@ public class PaymentV1Controller {
     private final PaymentService paymentService;
     private final UnitPriceService unitPriceService;
     private final PayOSService payOSService;
+    private final PaymentMapper paymentMapper;
 
     @PostMapping
     public ResponseObject createPaymentTransaction(@RequestBody PaymentTransactionRequest request) throws Exception {
         UnitPrice rs = unitPriceService.findByStoreAndTableType(request.getStoreID(), request.getTableType());
-        PaymentTransactionResponse response = paymentService.createPaymentTransaction(request, rs);
-
+        PaymentTransactionResponse response = paymentService.parsePaymentTransaction(request, rs);
+        PaymentTransaction p = paymentMapper.toPayment(response);
+        p.setUnitPrice(rs);
         //call PayOS
         CheckoutResponseData checkout = payOSService.createPaymentLink(
                 String.valueOf(response.getTableType()),
@@ -59,8 +63,10 @@ public class PaymentV1Controller {
 
         response.setOrderCode(checkout.getOrderCode());
         response.setPaymentLinkId(checkout.getPaymentLinkId());
+        p.setOrderCode(checkout.getOrderCode());
+        p.setPaymentLinkId(checkout.getPaymentLinkId());
 
-        paymentService.updatePaymentLinkIdAndOrderCode(checkout.getOrderCode(), checkout.getPaymentLinkId(), response.getTransactionID());
+        paymentService.savePaymentTransaction(p);
 
         return ResponseObject.builder()
                 .status(1000)

@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -105,8 +106,9 @@ public class PaymentService extends BaseSpecificationService<PaymentTransaction,
     //    private LocalDateTime updatedAt;
 
     @Override
-    public PaymentTransactionResponse createPaymentTransaction(PaymentTransactionRequest request, UnitPrice rs) {
+    public PaymentTransactionResponse parsePaymentTransaction(PaymentTransactionRequest request, UnitPrice rs) {
         PaymentTransaction p = paymentMapper.toPaymentTransaction(request);
+        p.setTransactionID(UUID.randomUUID().toString());
         p.setUnitPrice(rs);
         p.setPaymentMethod(PaymentMethod.VNPAY);
         p.setStatus(PaymentStatus.PENDING);
@@ -131,7 +133,7 @@ public class PaymentService extends BaseSpecificationService<PaymentTransaction,
         //set currency
         p.setCurrencyCode(CurencyCode.VND);
 
-        return paymentMapper.toPaymentTransactionResponse(paymentTransactionRepo.save(p));
+        return paymentMapper.toPaymentTransactionResponse(p);
     }
 
     @Override
@@ -169,6 +171,10 @@ public class PaymentService extends BaseSpecificationService<PaymentTransaction,
 
     public PaymentTransaction findByOrderCodeAndPaymentLinkId(long orderCode, String paymentLinkId) {
         return paymentTransactionRepo.findByOrderCodeAndPaymentLinkId(orderCode, paymentLinkId);
+    }
+
+    public PaymentTransaction savePaymentTransaction(PaymentTransaction paymentTransaction) {
+        return paymentTransactionRepo.save(paymentTransaction);
     }
 
 

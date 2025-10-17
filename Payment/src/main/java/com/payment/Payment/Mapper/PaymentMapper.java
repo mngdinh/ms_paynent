@@ -14,4 +14,5 @@ public interface PaymentMapper {
     PaymentTransactionResponse toPaymentTransactionResponse(PaymentTransaction paymentTransaction);
 
     PaymentTransaction toPaymentTransaction(PaymentTransactionRequest paymentTransactionRequest);
+    PaymentTransaction toPayment(PaymentTransactionResponse response);
 }

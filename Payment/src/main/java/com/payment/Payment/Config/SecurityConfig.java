@@ -20,9 +20,13 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -85,6 +89,42 @@ public class SecurityConfig {
             return authorities;
         });
         return converter;
+    }
+
+    //CORS handling
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "https://localhost:5173",
+                "https://score-lens.vercel.app",
+                "https://scorelens.onrender.com",
+                "https://scorelens-gateway.onrender.com",
+                "https://localhost:7174",
+                "http://localhost:7174"
+        ));
+
+        // Thêm pattern cho mobile apps
+        corsConfiguration.setAllowedOriginPatterns(Arrays.asList(
+                "exp://*",           // Expo mobile apps
+                "capacitor://*",     // Capacitor apps
+                "ionic://*",         // Ionic apps
+                "file://*",          // Local file protocol
+                "*://192.168.*.*:*", // Local network IPs
+                "*://10.*.*.*:*",    // Private network IPs
+                "*://172.*.*.*:*"    // Private network IPs
+        ));
+        //corsConfiguration.addAllowedOriginPattern("*"); // mở rộng cho tất cả các port localhost
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.addAllowedHeader("*");
+
+        UrlBasedCorsConfigurationSource url = new UrlBasedCorsConfigurationSource();
+        url.registerCorsConfiguration("/**", corsConfiguration);
+
+        return new CorsFilter(url);
     }
 
 }
