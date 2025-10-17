@@ -42,14 +42,13 @@ spring:
     producer:
       retries: 3                             # Retry 3 l?n n?u l?i
       properties:
-        retry.backoff.ms: 1000               # Th?i gian gi?a các l?n retry
+        retry.backoff.ms: 1000               # Th?i gian gi?a cï¿½c l?n retry
         connections.max.idle.ms: 30000      # Idle connection timeout
-        max.block.ms: 5000                   # Block t?i ?a khi Kafka ch?a s?n sàng
+        max.block.ms: 5000                   # Block t?i ?a khi Kafka ch?a s?n sï¿½ng
         request.timeout.ms: 3000             # Th?i gian ch? broker tr? l?i
       acks: all                               # Confirm t?t c? broker nh?n message
 springdoc:
   swagger-ui:
-    enable: true
     tags-sorter: alpha
     path: /swagger-ui.html
 jwt:
@@ -58,22 +57,22 @@ jwt:
   refreshable-duration: ${JWT_REFRESHABLE_DURATION} #in seconds
   issuer: ${JWT_ISSUER}
   audience: ${JWT_AUDIENCE}
-firebase:
-  type: ${FIREBASE_TYPE}
-  project-id: ${FIREBASE_PROJECT_ID}
-  private-key-id: ${FIREBASE_PRIVATE_KEY_ID}
-  private-key: ${FIREBASE_PRIVATE_KEY}
-  client-email: ${FIREBASE_CLIENT_EMAIL}
-  client-id: ${FIREBASE_CLIENT_ID}
-  auth-uri: ${FIREBASE_AUTH_URI}
-  token-uri: ${FIREBASE_TOKEN_URI}
-  auth-provider-x509-cert-url: ${FIREBASE_AUTH_PROVIDER_X509_CERT_URL}
-  client-x509-cert-url: ${FIREBASE_CLIENT_X509_CERT_URL}
-  universe-domain: ${FIREBASE_UNIVERSE_DOMAIN}
-
-app:
-  frontend:
-    url: ${FRONTEND_URL}
+#firebase:
+#  type: ${FIREBASE_TYPE}
+#  project-id: ${FIREBASE_PROJECT_ID}
+#  private-key-id: ${FIREBASE_PRIVATE_KEY_ID}
+#  private-key: ${FIREBASE_PRIVATE_KEY}
+#  client-email: ${FIREBASE_CLIENT_EMAIL}
+#  client-id: ${FIREBASE_CLIENT_ID}
+#  auth-uri: ${FIREBASE_AUTH_URI}
+#  token-uri: ${FIREBASE_TOKEN_URI}
+#  auth-provider-x509-cert-url: ${FIREBASE_AUTH_PROVIDER_X509_CERT_URL}
+#  client-x509-cert-url: ${FIREBASE_CLIENT_X509_CERT_URL}
+#  universe-domain: ${FIREBASE_UNIVERSE_DOMAIN}
+#
+#app:
+#  frontend:
+#    url: ${FRONTEND_URL}
 
 
 
