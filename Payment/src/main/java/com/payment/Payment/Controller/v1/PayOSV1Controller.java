@@ -50,8 +50,9 @@ public class PayOSV1Controller {
 
     @PostMapping("/webhook")
     public ResponseEntity<String> handleWebhook(@RequestBody PayOSWebhookRequest payload) {
-        log.info("Received PayOS Webhook Request: {}", payload);
+        log.info("Updating status for orderCode={} linkId={}", payload.getOrderCode(), payload.getPaymentLinkId());
         PaymentTransactionResponse p = paymentService.updatePaymentStatus(payload);
+        log.info("Updated transaction status to: {}", p.getStatus());
         webSocketService.sendToWebSocket(
                 WebSocketTopic.NOTI_NOTIFICATION.getValue() + p.getTableID(),
                 new WebsocketReq(WSFCMCode.PAYMENT, p)

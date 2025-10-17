@@ -148,8 +148,30 @@ public class PaymentService extends BaseSpecificationService<PaymentTransaction,
     @Override
     public PaymentTransactionResponse updatePaymentStatus(PayOSWebhookRequest request) {
         PaymentTransaction p = findByOrderCodeAndPaymentLinkId(request.getOrderCode(), request.getPaymentLinkId());
+        if (p == null) {
+            log.warn("No transaction found for orderCode={} and paymentLinkId={}",
+                    request.getOrderCode(), request.getPaymentLinkId());
+            throw new AppException(ErrorCode.NULL_RECORD);
+        }
         p.setUpdatedAt(LocalDateTime.now());
-        p.setStatus(PaymentStatus.valueOf(request.getStatus()));
+        String status = request.getStatus();
+        if (status != null) {
+            switch (status.toUpperCase()) {
+                case "PAID":
+                    p.setStatus(PaymentStatus.PAID);
+                    break;
+                case "PROCESSING":
+                    p.setStatus(PaymentStatus.PROCESSING);
+                    break;
+                case "CANCELLED":
+                    p.setStatus(PaymentStatus.CANCELLED);
+                    break;
+                default:
+                    p.setStatus(PaymentStatus.PENDING);
+            }
+        } else {
+            p.setStatus(PaymentStatus.PENDING);
+        }
         return paymentMapper.toPaymentTransactionResponse(paymentTransactionRepo.save(p));
     }
 
