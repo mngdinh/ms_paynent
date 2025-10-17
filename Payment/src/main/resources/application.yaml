@@ -1,0 +1,79 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+spring:
+  main:
+    allow-circular-references: true
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  web:
+    resources:
+      add-mappings: true
+  config:
+    import: optional:file:.env[.properties]
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    ssl:
+      key-store-location: ${KAFKA_KEYSTORE_LOCATION}
+      key-store-password: ${KAFKA_KEYSTORE_PASSWORD}
+      key-store-type: ${KAFKA_KEYSTORE_TYPE}
+      key-password: ${KAFKA_KEY_PASSWORD}
+      trust-store-location: ${KAFKA_TRUSTSTORE_LOCATION}
+      trust-store-password: ${KAFKA_TRUSTSTORE_PASSWORD}
+      trust-store-type: ${KAFKA_TRUSTSTORE_TYPE}
+    consumer:
+      group-id: ${KAFKA_GROUP_ID}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    # Producer config
+    producer:
+      retries: 3                             # Retry 3 l?n n?u l?i
+      properties:
+        retry.backoff.ms: 1000               # Th?i gian gi?a các l?n retry
+        connections.max.idle.ms: 30000      # Idle connection timeout
+        max.block.ms: 5000                   # Block t?i ?a khi Kafka ch?a s?n sàng
+        request.timeout.ms: 3000             # Th?i gian ch? broker tr? l?i
+      acks: all                               # Confirm t?t c? broker nh?n message
+springdoc:
+  swagger-ui:
+    enable: true
+    tags-sorter: alpha
+    path: /swagger-ui.html
+jwt:
+  signerKey: ${JWT_SIGNER_KEY}
+  valid-duration: ${JWT_VALID_DURATION} #in second
+  refreshable-duration: ${JWT_REFRESHABLE_DURATION} #in seconds
+  issuer: ${JWT_ISSUER}
+  audience: ${JWT_AUDIENCE}
+firebase:
+  type: ${FIREBASE_TYPE}
+  project-id: ${FIREBASE_PROJECT_ID}
+  private-key-id: ${FIREBASE_PRIVATE_KEY_ID}
+  private-key: ${FIREBASE_PRIVATE_KEY}
+  client-email: ${FIREBASE_CLIENT_EMAIL}
+  client-id: ${FIREBASE_CLIENT_ID}
+  auth-uri: ${FIREBASE_AUTH_URI}
+  token-uri: ${FIREBASE_TOKEN_URI}
+  auth-provider-x509-cert-url: ${FIREBASE_AUTH_PROVIDER_X509_CERT_URL}
+  client-x509-cert-url: ${FIREBASE_CLIENT_X509_CERT_URL}
+  universe-domain: ${FIREBASE_UNIVERSE_DOMAIN}
+
+app:
+  frontend:
+    url: ${FRONTEND_URL}
+
+
+
