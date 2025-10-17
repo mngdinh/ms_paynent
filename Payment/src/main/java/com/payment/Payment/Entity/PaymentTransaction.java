@@ -71,7 +71,7 @@ public class PaymentTransaction {
     private PaymentStatus status;        // PENDING / SUCCESS / FAILED
 
     @Column(name = "price", length = 10)
-    private Double price;
+    private int price;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "currencyCode", length = 10)
@@ -86,6 +86,12 @@ public class PaymentTransaction {
 
     @Column(name = "modifierID", length = 50)
     private String modifierID;
+
+    @Column(name = "orderCode")
+    private long orderCode;
+
+    @Column(name = "paymentLinkId")
+    private String paymentLinkId;
 
     @NotNull
     @Column(name = "createAt")

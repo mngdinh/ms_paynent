@@ -126,7 +126,7 @@ public class PaymentService extends BaseSpecificationService<PaymentTransaction,
             p.setAmount(Double.parseDouble(String.valueOf(minutes)));
         }
         //set price
-        p.setPrice(rs.getBasePrice() * duration.getSeconds() / 3600); //theo hour
+        p.setPrice((int) Math.round(rs.getBasePrice() * duration.getSeconds() / 3600)); //theo hour
         p.setCreatedAt(LocalDateTime.now());
         //set currency
         p.setCurrencyCode(CurencyCode.VND);
@@ -145,8 +145,10 @@ public class PaymentService extends BaseSpecificationService<PaymentTransaction,
 
     @Override
     public PaymentTransactionResponse updatePaymentStatus(PayOSWebhookRequest request) {
-        log.info(request.toString());
-        return null;
+        PaymentTransaction p = findByOrderCodeAndPaymentLinkId(request.getOrderCode(), request.getPaymentLinkId());
+        p.setUpdatedAt(LocalDateTime.now());
+        p.setStatus(PaymentStatus.valueOf(request.getStatus()));
+        return paymentMapper.toPaymentTransactionResponse(paymentTransactionRepo.save(p));
     }
 
     @Override
@@ -155,6 +157,18 @@ public class PaymentService extends BaseSpecificationService<PaymentTransaction,
                 .orElseThrow(() -> new AppException(ErrorCode.NULL_RECORD));
         paymentTransactionRepo.delete(p);
         return true;
+    }
+
+    public void updatePaymentLinkIdAndOrderCode(long orderCode, String paymentLinkId, String transactionID) {
+        PaymentTransaction p = paymentTransactionRepo.findById(transactionID)
+                .orElseThrow(() -> new AppException(ErrorCode.NULL_RECORD));
+        p.setOrderCode(orderCode);
+        p.setPaymentLinkId(paymentLinkId);
+        log.info("paymentLinkId: " + paymentLinkId + " orderCode: " + orderCode + " transactionID: " + transactionID);
+    }
+
+    public PaymentTransaction findByOrderCodeAndPaymentLinkId(long orderCode, String paymentLinkId) {
+        return paymentTransactionRepo.findByOrderCodeAndPaymentLinkId(orderCode, paymentLinkId);
     }
 
 

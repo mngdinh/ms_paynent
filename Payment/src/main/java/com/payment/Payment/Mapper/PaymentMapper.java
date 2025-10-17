@@ -13,6 +13,5 @@ public interface PaymentMapper {
     @Mapping(source = "unitPrice.baseUnit", target = "baseUnit")
     PaymentTransactionResponse toPaymentTransactionResponse(PaymentTransaction paymentTransaction);
 
-
     PaymentTransaction toPaymentTransaction(PaymentTransactionRequest paymentTransactionRequest);
 }

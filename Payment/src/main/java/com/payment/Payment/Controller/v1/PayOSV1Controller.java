@@ -35,15 +35,14 @@ public class PayOSV1Controller {
         return payosService.createPaymentLink(
                 request.getProductName(),
                 request.getQuantity(),
-                request.getPrice()
+                request.getPrice(),
+                "Payment Test"
         );
     }
 
     @PostMapping("/webhook")
     public ResponseEntity<String> handleWebhook(@RequestBody PayOSWebhookRequest payload) {
-        // ✅ Xác thực chữ ký (nếu có cấu hình secret key)
-        // ✅ Cập nhật trạng thái giao dịch trong DB
-
+        log.info("Received PayOS Webhook Request: {}", payload);
         paymentService.updatePaymentStatus(payload);
         return ResponseEntity.ok("OK");
     }

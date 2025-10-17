@@ -29,7 +29,7 @@ public class PayOSService {
     }
 
 
-    public CheckoutResponseData createPaymentLink(String name, int quantity, int price) throws Exception {
+    public CheckoutResponseData createPaymentLink(String name, int quantity, int price, String dessciption) throws Exception {
         long orderCode = System.currentTimeMillis() / 1000;
 
         ItemData itemData = ItemData.builder()
@@ -41,7 +41,7 @@ public class PayOSService {
         PaymentData paymentData = PaymentData.builder()
                 .orderCode(orderCode)
                 .amount(price * quantity)
-                .description("Thanh toán đơn hàng")
+                .description(dessciption)
                 .returnUrl(domain + "/success.html")
                 .cancelUrl(domain + "/cancel.html")
                 .item(itemData)

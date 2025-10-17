@@ -8,6 +8,7 @@ import com.payment.Payment.DTOs.Respone.ResponseObject;
 import com.payment.Payment.DTOs.Respone.UnitPriceResponse;
 import com.payment.Payment.Entity.UnitPrice;
 import com.payment.Payment.Enum.PaymentStatus;
+import com.payment.Payment.Service.PayOSService;
 import com.payment.Payment.Service.PaymentService;
 import com.payment.Payment.Service.UnitPriceService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import vn.payos.type.CheckoutResponseData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,13 +35,32 @@ public class PaymentV1Controller {
 
     private final PaymentService paymentService;
     private final UnitPriceService unitPriceService;
+    private final PayOSService payOSService;
 
     @PostMapping
-    public ResponseObject createPaymentTransaction(@RequestBody PaymentTransactionRequest request) {
+    public ResponseObject createPaymentTransaction(@RequestBody PaymentTransactionRequest request) throws Exception {
         UnitPrice rs = unitPriceService.findByStoreAndTableType(request.getStoreID(), request.getTableType());
         PaymentTransactionResponse response = paymentService.createPaymentTransaction(request, rs);
 
+        //call PayOS
+        CheckoutResponseData checkout = payOSService.createPaymentLink(
+                String.valueOf(response.getTableType()),
+                1,
+                response.getPrice(),
+                "Thanh toán trận đấu " + String.valueOf(response.getMatchID())
+        );
+        response.setBin(checkout.getBin());
+        response.setAccountNumber(checkout.getAccountNumber());
+        response.setAccountName(checkout.getAccountName());
+        response.setDescription(checkout.getDescription());
+        response.setExpiredAt(checkout.getExpiredAt());
+        response.setCheckoutUrl(checkout.getCheckoutUrl());
+        response.setQrCode(checkout.getQrCode());
 
+        response.setOrderCode(checkout.getOrderCode());
+        response.setPaymentLinkId(checkout.getPaymentLinkId());
+
+        paymentService.updatePaymentLinkIdAndOrderCode(checkout.getOrderCode(), checkout.getPaymentLinkId(), response.getTransactionID());
 
         return ResponseObject.builder()
                 .status(1000)
@@ -130,6 +151,15 @@ public class PaymentV1Controller {
                 .status(1000)
                 .message("Payment Transaction Updated")
                 .data(paymentService.updatePaymentStatus(transactionID, paymentStatus))
+                .build();
+    }
+
+    @PutMapping("/searching")
+    public ResponseObject searchPaymentTransactions(@RequestParam long orderCode, @RequestParam String paymentLinkId){
+        return ResponseObject.builder()
+                .status(1000)
+                .message("Payment Transaction Searched")
+                .data(paymentService.findByOrderCodeAndPaymentLinkId(orderCode, paymentLinkId))
                 .build();
     }
 
