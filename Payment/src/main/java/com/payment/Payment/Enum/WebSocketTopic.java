@@ -13,6 +13,7 @@ public enum WebSocketTopic {
     NOTI_NOTIFICATION("/topic/notification/"),
     NOTI_MOBILE("/topic/match_event/"),
     DASHBOARD("/topic/dashboard/"),
+    PAYMENT_SUCCESS("/topic/payment/"),
     ;
 
 

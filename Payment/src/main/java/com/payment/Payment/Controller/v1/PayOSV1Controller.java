@@ -61,7 +61,7 @@ public class PayOSV1Controller {
                     new WebsocketReq(WSFCMCode.PAYMENT_SUCCESS, p)
             );
             webSocketService.sendToWebSocket(
-                    WebSocketTopic.DASHBOARD.getValue() +  p.getTableID(),
+                    WebSocketTopic.PAYMENT_SUCCESS.getValue() +  p.getTableID(),
                     new WebsocketReq(WSFCMCode.PAYMENT_SUCCESS, p)
             );
             log.info("send message by websocket to table: {} ", p.getTableID());
