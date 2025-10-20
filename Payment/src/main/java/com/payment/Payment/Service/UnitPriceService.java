@@ -65,7 +65,7 @@ public class UnitPriceService extends BaseSpecificationService<UnitPrice, UnitPr
                 }
             }
             else if ("byStore".equals(queryType)) {
-                predicates.add(cb.equal(root.get("store").get("storeID"), storeId));
+                predicates.add(cb.equal(root.get("storeID"), storeId));
                 if (tableType != null && !tableType.isEmpty()) {
                     predicates.add(cb.equal(root.get("tableType"), tableType));
                 }

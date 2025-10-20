@@ -36,7 +36,7 @@ public class PayOSV1Controller {
         this.payosService = payosService;
     }
 
-    @PostMapping("/create-payment-link")
+    @PostMapping("/link")
     public CheckoutResponseData createPayment(@RequestBody PayOSRequest request) throws Exception {
         return payosService.createPaymentLink(
                 request.getProductName(),

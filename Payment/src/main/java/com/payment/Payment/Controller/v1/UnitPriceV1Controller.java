@@ -41,7 +41,7 @@ public class UnitPriceV1Controller {
 
     @GetMapping
     public ResponseObject getUnitPrices(
-            @Parameter(description = "Query type: all, byStore, byType",
+            @Parameter(description = "Query type: all, byStore",
                     required = true,
                     schema = @Schema(
                             allowableValues = {"all", "byType", "byStore"}

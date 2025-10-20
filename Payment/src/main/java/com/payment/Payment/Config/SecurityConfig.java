@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -45,12 +46,33 @@ public class SecurityConfig {
     @Autowired
     private CustomAccessDeniedHandler customAccessDeniedHandler;
 
+    private final String[] PUBLIC_ENDPOINTS = {
+            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+            "/index.html",
+            "/ws/**",
+            "/ws-native", "/ws-native/**",
+            "/v1/health",
+            "/v1/payos/webhook"
+    };
+
+    private final String[] ADMIN_ENDPOINTS = {
+            "/v1/prices",
+            "/v1/payos/link"
+    };
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(request ->
-//                request.anyRequest().authenticated());
-                request.anyRequest().permitAll());
+        http.authorizeHttpRequests(request -> request
+                .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                .requestMatchers(HttpMethod.POST, "/v1/payments").hasAnyRole("STAFF", "MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/v1/payments/status").hasAnyRole("STAFF", "MANAGER",  "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/v1/prices").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.POST, ADMIN_ENDPOINTS).hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/v1/payments/**").hasRole("ADMIN")
+
+                .anyRequest().authenticated());
+
 
         http.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer ->
@@ -65,7 +87,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    JwtDecoder jwtDecoder(){
+    JwtDecoder jwtDecoder() {
         SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HmacSHA256");
         return NimbusJwtDecoder.withSecretKey(secretKeySpec)
                 .macAlgorithm(MacAlgorithm.HS256)

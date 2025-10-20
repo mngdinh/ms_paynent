@@ -24,7 +24,7 @@ public class UnitPrice {
     private Integer unitPriceID;
 
     @NotNull
-    @Column(name = "storeID", nullable = false, length = 50, unique = true)
+    @Column(name = "storeID", nullable = false, length = 50)
     private String storeID;
 
     @NotNull
