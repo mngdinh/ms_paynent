@@ -58,11 +58,11 @@ public class PayOSV1Controller {
             PaymentTransactionResponse p = paymentService.updateSuccessPaymentStatus(payload);
             webSocketService.sendToWebSocket(
                     WebSocketTopic.NOTI_NOTIFICATION.getValue() + p.getTableID(),
-                    new WebsocketReq(WSFCMCode.PAYMENT, p)
+                    new WebsocketReq(WSFCMCode.PAYMENT_SUCCESS, p)
             );
             webSocketService.sendToWebSocket(
                     WebSocketTopic.DASHBOARD.getValue(),
-                    new WebsocketReq(WSFCMCode.PAYMENT, p)
+                    new WebsocketReq(WSFCMCode.PAYMENT_SUCCESS, p)
             );
             log.info("send message by websocket to table: {} ", p.getTableID());
             log.info("payload: {} is legit", payload.getSignature());
@@ -70,7 +70,6 @@ public class PayOSV1Controller {
         } else {
             log.error("payload: {} is non-legit", payload.getSignature());
             return ResponseEntity.ok("ERROR");
-
         }
 
     }

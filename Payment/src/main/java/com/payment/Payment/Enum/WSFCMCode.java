@@ -9,6 +9,7 @@ public enum WSFCMCode {
     MATCH_START,
     WINNING_SET,
     WINNING_MATCH,
-    PAYMENT
+    PAYMENT_SUCCESS,
+    PAYMENT_FAILURE,
 
 }
