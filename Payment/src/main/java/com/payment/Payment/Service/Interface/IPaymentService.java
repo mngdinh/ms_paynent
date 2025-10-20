@@ -8,7 +8,7 @@ import com.payment.Payment.Enum.PaymentStatus;
 
 public interface IPaymentService {
     PaymentTransactionResponse parsePaymentTransaction(PaymentTransactionRequest paymentTransactionRequest, UnitPrice rs);
-    PaymentTransactionResponse updatePaymentStatus(String transactionID, PaymentStatus paymentStatus);
-    PaymentTransactionResponse updatePaymentStatus(PayOSWebhookRequest request);
+    PaymentTransactionResponse updateSuccessPaymentStatus(String transactionID, PaymentStatus paymentStatus);
+    PaymentTransactionResponse updateSuccessPaymentStatus(PayOSWebhookRequest request);
     boolean deletePaymentTransaction(String transactionID);
 }

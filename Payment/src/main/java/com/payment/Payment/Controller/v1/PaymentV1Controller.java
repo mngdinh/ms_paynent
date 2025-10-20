@@ -156,16 +156,7 @@ public class PaymentV1Controller {
         return ResponseObject.builder()
                 .status(1000)
                 .message("Payment Transaction Updated")
-                .data(paymentService.updatePaymentStatus(transactionID, paymentStatus))
-                .build();
-    }
-
-    @PutMapping("/searching")
-    public ResponseObject searchPaymentTransactions(@RequestParam long orderCode, @RequestParam String paymentLinkId){
-        return ResponseObject.builder()
-                .status(1000)
-                .message("Payment Transaction Searched")
-                .data(paymentService.findByOrderCodeAndPaymentLinkId(orderCode, paymentLinkId))
+                .data(paymentService.updateSuccessPaymentStatus(transactionID, paymentStatus))
                 .build();
     }
 

@@ -1,16 +1,24 @@
 package com.payment.Payment.DTOs.Request;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PayOSWebhookRequest {
-    private Long orderCode;
-    private Double amount;
-    private String description;
-    private String status;
-    private String paymentLinkId;
-    private String accountNumber;
-    private String accountName;
+    @JsonProperty("code")
+    private String code;
+
+    @JsonProperty("desc")
+    private String desc;
+
+    @JsonProperty("success")
+    private boolean success;
+
+    @JsonProperty("data")
+    private PayOSWebhookDataRequest data;
+
+    @JsonProperty("signature")
+    private String signature;
 }

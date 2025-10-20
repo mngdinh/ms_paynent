@@ -3,7 +3,6 @@ package com.payment.Payment.Service;
 import com.payment.Payment.DTOs.Request.PayOSWebhookRequest;
 import com.payment.Payment.DTOs.Request.PaymentTransactionRequest;
 import com.payment.Payment.DTOs.Respone.PaymentTransactionResponse;
-import com.payment.Payment.DTOs.Respone.UnitPriceResponse;
 import com.payment.Payment.Entity.PaymentTransaction;
 import com.payment.Payment.Entity.UnitPrice;
 import com.payment.Payment.Enum.*;
@@ -137,7 +136,7 @@ public class PaymentService extends BaseSpecificationService<PaymentTransaction,
     }
 
     @Override
-    public PaymentTransactionResponse updatePaymentStatus(String transactionID, PaymentStatus paymentStatus) {
+    public PaymentTransactionResponse updateSuccessPaymentStatus(String transactionID, PaymentStatus paymentStatus) {
         PaymentTransaction p = paymentTransactionRepo.findById(transactionID)
                 .orElseThrow(() -> new AppException(ErrorCode.NULL_RECORD));
         p.setStatus(paymentStatus);
@@ -146,33 +145,14 @@ public class PaymentService extends BaseSpecificationService<PaymentTransaction,
     }
 
     @Override
-    public PaymentTransactionResponse updatePaymentStatus(PayOSWebhookRequest request) {
-        PaymentTransaction p = findByOrderCodeAndPaymentLinkId(request.getOrderCode(), request.getPaymentLinkId());
+    public PaymentTransactionResponse updateSuccessPaymentStatus(PayOSWebhookRequest request) {
+        PaymentTransaction p = paymentTransactionRepo.findFirstByStatus(PaymentStatus.PENDING);
         if (p == null) {
-            log.warn("No transaction found for orderCode={} and paymentLinkId={}",
-                    request.getOrderCode(), request.getPaymentLinkId());
+            log.warn("No transaction found for status={}", PaymentStatus.PENDING);
             throw new AppException(ErrorCode.NULL_RECORD);
         }
         p.setUpdatedAt(LocalDateTime.now());
-        String status = request.getStatus();
-        log.info("request status={}", status);
-        if (status != null) {
-            switch (status.toUpperCase()) {
-                case "PAID":
-                    p.setStatus(PaymentStatus.PAID);
-                    break;
-                case "PROCESSING":
-                    p.setStatus(PaymentStatus.PROCESSING);
-                    break;
-                case "CANCELLED":
-                    p.setStatus(PaymentStatus.CANCELLED);
-                    break;
-                default:
-                    p.setStatus(PaymentStatus.PENDING);
-            }
-        } else {
-            p.setStatus(PaymentStatus.PENDING);
-        }
+        p.setStatus(PaymentStatus.PAID);
         return paymentMapper.toPaymentTransactionResponse(paymentTransactionRepo.save(p));
     }
 
@@ -184,20 +164,8 @@ public class PaymentService extends BaseSpecificationService<PaymentTransaction,
         return true;
     }
 
-    public void updatePaymentLinkIdAndOrderCode(long orderCode, String paymentLinkId, String transactionID) {
-        PaymentTransaction p = paymentTransactionRepo.findById(transactionID)
-                .orElseThrow(() -> new AppException(ErrorCode.NULL_RECORD));
-        p.setOrderCode(orderCode);
-        p.setPaymentLinkId(paymentLinkId);
-        log.info("paymentLinkId: " + paymentLinkId + " orderCode: " + orderCode + " transactionID: " + transactionID);
-    }
-
-    public PaymentTransaction findByOrderCodeAndPaymentLinkId(long orderCode, String paymentLinkId) {
-        return paymentTransactionRepo.findByOrderCodeAndPaymentLinkId(orderCode, paymentLinkId);
-    }
-
-    public PaymentTransaction savePaymentTransaction(PaymentTransaction paymentTransaction) {
-        return paymentTransactionRepo.save(paymentTransaction);
+    public void savePaymentTransaction(PaymentTransaction paymentTransaction) {
+        paymentTransactionRepo.save(paymentTransaction);
     }
 
 
