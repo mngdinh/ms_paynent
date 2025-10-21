@@ -4,10 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.Payment.DTOs.Request.PayOSRequest;
 import com.payment.Payment.DTOs.Request.PayOSWebhookRequest;
+import com.payment.Payment.DTOs.Request.ProducerRequest;
 import com.payment.Payment.DTOs.Request.WebsocketReq;
 import com.payment.Payment.DTOs.Respone.PaymentTransactionResponse;
+import com.payment.Payment.Enum.KafkaCode;
 import com.payment.Payment.Enum.WSFCMCode;
 import com.payment.Payment.Enum.WebSocketTopic;
+import com.payment.Payment.Service.KafkaProducer;
 import com.payment.Payment.Service.PayOSService;
 import com.payment.Payment.Service.PaymentService;
 import com.payment.Payment.Service.WebSocketService;
@@ -31,6 +34,8 @@ public class PayOSV1Controller {
     private PaymentService paymentService;
     @Autowired
     private WebSocketService webSocketService;
+    @Autowired
+    private KafkaProducer kafkaProducer;
 
     public PayOSV1Controller(PayOSService payosService) {
         this.payosService = payosService;
@@ -56,6 +61,10 @@ public class PayOSV1Controller {
         );
         if (isLegit) {
             PaymentTransactionResponse p = paymentService.updateSuccessPaymentStatus(payload);
+            kafkaProducer.sendEvent(
+                    p.getTableID(),
+                    new ProducerRequest(KafkaCode.PAYMENT, p.getTableID(), p.getMatchID())
+            );
             webSocketService.sendToWebSocket(
                     WebSocketTopic.NOTI_NOTIFICATION.getValue() + p.getTableID(),
                     new WebsocketReq(WSFCMCode.PAYMENT_SUCCESS, p)

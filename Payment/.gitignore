@@ -34,3 +34,13 @@ build/
 
 .env
 
+
+# ===================== #
+#   OS Specific         #
+# ===================== #
+.DS_Store
+Thumbs.db
+
+# Ignore all certs by default
+certs/*
+
