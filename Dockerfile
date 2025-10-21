@@ -27,7 +27,7 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 # ✅ Copy Kafka TLS certs folder
-COPY /certs certs
+COPY Payment/certs certs
 # Optional: copy additional resources if needed
 #COPY --from=build /app/uploads/lab /app/uploads/lab
 #COPY --from=build /app/ArialUnicodeMSBold.ttf /app/
