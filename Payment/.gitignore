@@ -41,6 +41,4 @@ build/
 .DS_Store
 Thumbs.db
 
-# Ignore all certs by default
-certs/*
 
